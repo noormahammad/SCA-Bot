@@ -12,7 +12,7 @@ namespace SCA_Bot
         protected void Application_Start()
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
-
+            //test
         }
     }
 }
