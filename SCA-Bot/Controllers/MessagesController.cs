@@ -4,21 +4,42 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using System.Web.Configuration;
+using SCA_Bot.Services;
+using System;
+using System.Diagnostics;
 
 namespace SCA_Bot
 {
     [BotAuthentication]
     public class MessagesController : ApiController
     {
+        private static readonly bool IsSpellCorrectionEnabled = bool.Parse(WebConfigurationManager.AppSettings["IsSpellCorrectionEnabled"]);
+
+        private readonly BingSpellCheckService spellService = new BingSpellCheckService();
+
         /// <summary>
         /// POST: api/Messages
         /// Receive a message from a user and reply to it
         /// </summary>
         public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
         {
+
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                if (IsSpellCorrectionEnabled)
+                {
+                    try
+                    {
+                        activity.Text = await this.spellService.GetCorrectedTextAsync(activity.Text);
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError(ex.ToString());
+                    }
+                }
+
+                await Conversation.SendAsync(activity, () => new Dialogs.RootLuisDialog());
             }
             else
             {
