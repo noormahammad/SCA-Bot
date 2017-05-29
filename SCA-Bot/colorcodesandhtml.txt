@@ -1,0 +1,111 @@
+close out
+
+Forecast%20Begin%20Date%2012/3/2017%0AForecast%20End%20Date%206/1/2018
+
+
+construction
+Actual%20Begin%20Date%201/25/2016%0AForecast%20End%20Date%2012/2/2017
+
+Request for Contract
+Actual%20Begin%20Date%204/13/2015%0AActual%20End%20Date%2011/16/2015
+
+Bid & Award
+
+Actual%20Begin%20Date%201/5/2015%0AActual%20End%20Date%203/9/2015
+
+Design
+
+Actual%20Begin%20Date%201/5/2015%0AActual%20End%20Date%203/9/2015
+
+
+Scope
+
+Actual%20Begin%20Date%2012/18/2014%0AActual%20End%20Date%2012/7/2015
+
+
+Pre-Scope
+
+Actual%20Begin%20Date%202/23/2014%0AActual%20End%20Date%2012/5/2014
+
+
+
+
+Actual%20Begin%20Date%2012/3/2017%0AActual%20End%20Date%205/1/2018%0A%0AForecast%20Begin%20Date%2012/3/2017%0AForecast%20End%20Date%205/1/2018
+
+
+
+colors:
+925 - pink
+928 - rose
+171 - green
+317 - blue
+
+"Funding Comment:
+Per K. Maher - We have realized and confirmed with the Brooklyn BP that the $500,000 allocated for LLW# 102649 was intended to fund the STEM Lab under LLW# 97353. Please cancel LLW# 102649 with a note that the Brooklyn Borough President intended to fund the Stem Lab under LLW# 97353. Transferred $500k from LLW 102649 to LLW 97353 from FY16 Reso A BP as an additional allocation. 
+Additionally, please have the project tagged as referred to legislator as it is still underfunded at this time and cannot proceed without sufficient funding in place. 
+",
+ 
+"Funding Comment:
+Per C. O'Leary and C. Liu, increase the project budget to $1M. 
+From: LIU, CORA Sent: Friday, March 11, 2016 10:31 AMTo: REDELICK, MITCHELL; O'LEARY, CHRISTOPHERCc: KUBOTA, NINASubject: RE: K884 CP16 VCT Flooring Replacement Approval RequestChris, Please increase the funding for this llw to $1million. Thanks. Cora LiuCapital Plan Management DepartmentNYC School Construction AuthorityTel: (718) 472-8377",
+
+"Bernard F. and G.S.Debra were assigned as DM & DPM per Boardroom Meeting on 03/17/16.",
+
+"Occupancy updated to September 2021 per OSP MEMO.",
+
+"4/30/15 Changed FY15 Priority 1 to FY16 Priority 5. Await D15432 construction completion (Ext Work), forecast end 2/2/16F. "
+"08/24/2016 - Comments from OIS: BP Section 211. FandE ONLY.",
+
+"08/20/2015 12:45:43 PM - Package D015345  was updated from CA.BA.AC  to CP.BA.PR.  - System Generated
+Solicitation Cancellation Reason: Bid come in well above estimate",
+
+"08/20/2015 12:45:43 PM - Package D015345  was updated from CA.BA.AC  to CP.BA.PR.  - System Generated
+Solicitation Cancellation Reason: Bid come in well above estimate",
+
+"Bid & Award process started on 04/09/15 and the project was awarded on 08/26/15.",
+
+"Per A&E re-forecasted Turnover date from 09/04/15 to 09/11/15.",
+
+"Per M. Redelick  - Changed agency from SCA to DSF. ",
+
+"A&E re-forecasted T/O date from 01/04/16 to 01/15/16 due to leasing issue.",
+
+"Project was hardcoded off from building completions report per Capital Planning.",
+
+"Project was hardcoded off from building completions report per Capital Planning.",
+
+"Occupancy updated from January 2016 to September 2016 per Capital Planning.",
+
+"Occupancy updated from January 2016 to February 2016 per Capital Planning.",
+
+"Project was hardcoded off from building completions report per Capital Planning."
+"Project was hardcoded off from building completions report per Capital Planning."
+
+"A&E turnedover project to CM on 12/31/15, received transmittal on 1/11/16 and turnover estimate was updated on 1/13/16.",
+
+"A & E turned over the project to CM on 05/11/16."
+"Funding Comment:
+Per F. Brennan - Please update LLW#101012 (Parcel C with the following cost updates):Construction costs: $40,141,843.00Total Construction: $56,646,452.57",
+
+"Funding Comment:
+Per F. Brennan - Update LLW#101012 (Parcel C with the following cost updates):Construction costs: $40,141,843.00Total Construction: $56,646,452.57"
+"05/05/2015 12:05:36 PM - LLW 100419 was forwarded from PC  to  AE  Station - System Generated"
+"05/05/2015 12:05:38 PM - LLW 100418 was forwarded from PC  to  AE  Station - System Generated"
+
+"Per K. Maher - Tag project as referred to legislator as it is still underfunded at this time and cannot proceed without sufficient funding in place. 
+"
+"Per K. Maher - Tag project as referred to legislator as it is still underfunded at this time and cannot proceed without sufficient funding in place. 
+"
+"A&E re-forecasted turnover date from 02/01/16 to 02/29/16 due to lease issue."
+
+
+
+
+
+
+
+
+
+
+
+

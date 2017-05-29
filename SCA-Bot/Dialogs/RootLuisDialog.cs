@@ -16,7 +16,7 @@ namespace SCA_Bot.Dialogs
     public class RootLuisDialog : LuisDialog<object>
     {
         #region Variables
-        private const string EntityGeographyCity = "builtin.geography.city";
+        private const string EntityNumber = "builtin.number";
 
         private const string EntitySchoolName = "SchoolName";
 
@@ -25,7 +25,18 @@ namespace SCA_Bot.Dialogs
         private const string EntityDesignBundle = "DesignBundle";
         private const string EntityPackage = "Package";
 
-        private IList<string> PhaseOptions = new List<string> { "Pre-Scope", "Scope", "Design", "Bid & Award", "Request for Contract", "Construction", "Closeout" };
+        private IList<string> PhaseOptions = new List<string> { "Closeout", "Construction", "Request for Contract", "Bid & Award", "Design", "Scope","Pre-Scope"};
+        private List<string> Schdules = new List<string> {
+            "Forecast%20Begin%20Date1%2012/3/2017%0A%0AForecast%20End%20Date%206/1/2018",
+            "Actual%20Begin%20Date%201/25/2016%0A%0AForecast%20End%20Date%2012/2/2017",
+            "Actual%20Begin%20Date%204/13/2015%0A%0AActual%20End%20Date%2011/16/2015",
+            "Actual%20Begin%20Date%201/5/2015%0A%0AActual%20End%20Date%203/9/2015",
+            "Actual%20Begin%20Date%201/5/2015%0A%0AActual%20End%20Date%203/9/2015",
+            "Actual%20Begin%20Date%2012/18/2014%0A%0AActual%20End%20Date%2012/7/2015",
+            "Actual%20Begin%20Date%202/23/2014%0A%0AActual%20End%20Date%2012/5/2014"
+        };
+        public List<string> colors = new List<string> {"928", "171", "317", "928", "171","317","928"};
+
         #endregion
 
         #region None Intent
@@ -115,19 +126,13 @@ namespace SCA_Bot.Dialogs
                     HeroCard heroCard = new HeroCard()
                     {
                         Title = $"{project.SchoolName} {project.LLWDescription}",
-                        Subtitle = $"LLW# {project.LLW}. Cost {project.ConstructionCost.ToString("C0")}.",
+                        Subtitle = $"LLW# {project.LLW}. Constr.Cost {project.ConstructionCost.ToString("C0")}.",
                         Images = new List<CardImage>()
                         {
                             new CardImage() { Url = project.Image }
                         },
                         Buttons = new List<CardAction>()
                         {
-                            new CardAction()
-                            {
-                                Title = "More details",
-                                Type = ActionTypes.OpenUrl,
-                                Value = $"https://www.bing.com/search?q=nycsca+in+" + HttpUtility.UrlEncode(project.BuildingAddress)
-                            },
                             new CardAction()
                             {
                                 Title = "Schedules",
@@ -139,6 +144,12 @@ namespace SCA_Bot.Dialogs
                                 Title = "Comments",
                                 Type = ActionTypes.ImBack,
                                 Value = $"Show Comments for LLW {project.LLW}"
+                            },
+                            new CardAction()
+                            {
+                                Title = "More details",
+                                Type = ActionTypes.OpenUrl,
+                                Value = $"https://www.bing.com/search?q=nycsca+in+" + HttpUtility.UrlEncode(project.BuildingAddress)
                             }
                         }
                     };
@@ -193,6 +204,11 @@ namespace SCA_Bot.Dialogs
                 entityRecommendation.Type = "Package";
                 await context.PostAsync($"Looking up schedules for Package No# {entityRecommendation.Entity}");
             }
+            else if(result.TryFindEntity(EntityNumber,out entityRecommendation))
+            {
+                entityRecommendation.Type = "Project";
+                await context.PostAsync($"Looking up schedules for Project {entityRecommendation.Entity}");
+            }
 
             if (entityRecommendation != null && !string.IsNullOrEmpty(entityRecommendation.Type))
             {
@@ -210,7 +226,7 @@ namespace SCA_Bot.Dialogs
                     {
                         new CardImage()
                         {
-                          Url = $"https://placeholdit.imgix.net/~text?txtsize=12&txt=Actual%20Begin%20Date%2012/3/2017%0AActual%20End%20Date%205/1/2018%0A%0AForecast%20Begin%20Date%2012/3/2017%0AForecast%20End%20Date%205/1/2018&w=250&h=120&txttrack=1&txtclr=302&txtfont=bold"
+                          Url = $"https://placeholdit.imgix.net/~text?txtsize=12&txt={Schdules[i]}&w=250&h=120&txttrack=1&txtclr={colors[i]}&txtfont=bold"
                         }
                         }
                     };
@@ -219,9 +235,91 @@ namespace SCA_Bot.Dialogs
                 }
                 await context.PostAsync(resultMessage);
             }
+            else
+            {
+                await context.PostAsync("Sorry, i am not able to find a valid project number in your message. please type something like 'show me schedule for db 12012''");
+            }
             context.Wait(this.MessageReceived);
         }
 
+        #endregion
+
+        #region DisplayComments Intent
+        [LuisIntent("DisplayComments")]
+        public async Task DisplayComments(IDialogContext context, LuisResult result )
+        {
+            EntityRecommendation entityRecommendation;
+
+            if (result.TryFindEntity(EntityLLW, out entityRecommendation))
+            {
+                entityRecommendation.Type = "LLW";
+                await context.PostAsync($"Retrieving project comments/notes for LLW# {entityRecommendation.Entity}");
+            }
+            else if (result.TryFindEntity(EntityDesignBundle, out entityRecommendation))
+            {
+                entityRecommendation.Type = "DesignBundle";
+                await context.PostAsync($"Retrieving project comments/notes for Design Bundle# {entityRecommendation.Entity}");
+            }
+            else if (result.TryFindEntity(EntityPackage, out entityRecommendation))
+            {
+                entityRecommendation.Type = "Package";
+                await context.PostAsync($"Retrieving project comments/notes for Package No# {entityRecommendation.Entity}");
+            }
+            else if (result.TryFindEntity(EntityNumber, out entityRecommendation))
+            {
+                entityRecommendation.Type = "Project";
+                await context.PostAsync($"Retrieving project comments/notes for Project {entityRecommendation.Entity}");
+            }
+
+            if (entityRecommendation != null && !string.IsNullOrEmpty(entityRecommendation.Type))
+            {
+                var resultMessage = context.MakeMessage();
+                resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                resultMessage.Attachments = new List<Attachment>();
+
+                for (int i = 0; i < 7; i++)
+                {
+                    var random = new Random(i);
+                    HeroCard herocard = new HeroCard()
+                    {
+                        Title = $"ODC Memo/Comment #{i+1}",
+                        Text =  GetComments()[i].Length > 120?GetComments()[i].Substring(0,120):GetComments()[i],
+                        Buttons = new List<CardAction>()
+                        {
+                            new CardAction()
+                            {
+                                Title = "More",
+                                Type = ActionTypes.ImBack,
+                                Value = $"More on ODC Memo/Comment #{i+1}"
+                            }
+                        }
+                    };
+
+                    resultMessage.Attachments.Add(herocard.ToAttachment());
+                }
+                await context.PostAsync(resultMessage);
+            }
+            else
+            {
+                await context.PostAsync("Sorry, i am not able to find a valid project number in your message. please type something like 'display comments for llw 12012', or 'show comments for design bundle 132043''");
+            }
+            context.Wait(this.MessageReceived);
+        }
+        #endregion
+
+        #region DisplayCommentDetail Intent
+        [LuisIntent("DisplayCommentDetail")]
+        public async Task DisplayCommentDetail(IDialogContext context, LuisResult result)
+        {
+            EntityRecommendation entityRecommendation;
+
+            if (result.TryFindEntity(EntityNumber, out entityRecommendation))
+                await context.PostAsync($"Here is full text of the comment#{entityRecommendation.Entity}: {GetComments()[int.Parse(entityRecommendation.Entity)-1]}");
+            else
+                await context.PostAsync("Sorry, i did not get that! type help if you need assistance!");
+
+            context.Wait(this.MessageReceived);
+        }
         #endregion
 
         #region Get Data for demo purposes
@@ -252,6 +350,24 @@ namespace SCA_Bot.Dialogs
             projects.Sort((h1, h2) => h1.ConstructionCost.CompareTo(h2.ConstructionCost));
 
             return projects;
+        }
+        private static string[] GetComments()
+        {
+            string[] comments = new string[] {
+                        "Funding Comment:Per K. Maher - We have realized and confirmed with the Brooklyn BP that the $500,000 allocated for LLW# 102649 was intended to fund the STEM Lab under LLW# 97353. Please cancel LLW# 102649 with a note that the Brooklyn Borough President intended to fund the Stem Lab under LLW# 97353. Transferred $500k from LLW 102649 to LLW 97353 from FY16 Reso A BP as an additional allocation. Additionally, please have the project tagged as referred to legislator as it is still underfunded at this time and cannot proceed without sufficient funding in place.",
+                        "Funding Comment:Per C.O'Leary and C. Liu, increase the project budget to $1M. ",
+                        "Bernard F. and G.S.Debra were assigned as DM & DPM per Boardroom Meeting on 03/17/16.",
+                        "Occupancy updated to September 2021 per OSP MEMO.",
+                        "4/30/15 Changed FY15 Priority 1 to FY16 Priority 5. Await D15432 construction completion (Ext Work), forecast end 2/2/16F. ",
+                        "08/24/2016 - Comments from OIS: BP Section 211. FandE ONLY.",
+                        "08/20/2015 12:45:43 PM - Package D015345  was updated from CA.BA.AC  to CP.BA.PR.  - System Generated Solicitation Cancellation Reason: Bid come in well above estimate",
+                        "08/20/2015 12:45:43 PM - Package D015345  was updated from CA.BA.AC  to CP.BA.PR.  - System Generated Solicitation Cancellation Reason: Bid come in well above estimate",
+                        "Bid & Award process started on 04/09/15 and the project was awarded on 08/26/15.",
+                        "Per A&E re-forecasted Turnover date from 09/04/15 to 09/11/15.",
+                        "Per M. Redelick  - Changed agency from SCA to DSF. ",
+                        "A&E re-forecasted T/O date from 01/04/16 to 01/15/16 due to leasing issue."
+            };
+            return comments;
         }
         private static string[] GetLLWDescriptions()
         {
