@@ -147,9 +147,9 @@ namespace SCA_Bot.Dialogs
                             },
                             new CardAction()
                             {
-                                Title = "More details",
-                                Type = ActionTypes.OpenUrl,
-                                Value = $"https://www.bing.com/search?q=nycsca+in+" + HttpUtility.UrlEncode(project.BuildingAddress)
+                                Title = "People",
+                                Type = ActionTypes.ImBack,
+                                Value = $"show people assigned to LLW {project.LLW}"
                             }
                         }
                     };
@@ -279,7 +279,6 @@ namespace SCA_Bot.Dialogs
 
                 for (int i = 0; i < 7; i++)
                 {
-                    var random = new Random(i);
                     HeroCard herocard = new HeroCard()
                     {
                         Title = $"ODC Memo/Comment #{i+1}",
@@ -318,6 +317,63 @@ namespace SCA_Bot.Dialogs
             else
                 await context.PostAsync("Sorry, i did not get that! type help if you need assistance!");
 
+            context.Wait(this.MessageReceived);
+        }
+        #endregion
+
+        #region FindPeopleForProject
+        [LuisIntent("FindPeopleForProject")]
+        public async Task FindPeopleForProject(IDialogContext context, LuisResult result)
+        {
+            EntityRecommendation entityRecommendation;
+            if (result.TryFindEntity(EntityLLW, out entityRecommendation))
+            {
+                entityRecommendation.Type = "LLW";
+                await context.PostAsync($"Following people are assigned to LLW# {entityRecommendation.Entity}");
+            }
+            else if (result.TryFindEntity(EntityDesignBundle, out entityRecommendation))
+            {
+                entityRecommendation.Type = "DesignBundle";
+                await context.PostAsync($"Following people are assigned to Design Bundle# {entityRecommendation.Entity}");
+            }
+            else if (result.TryFindEntity(EntityPackage, out entityRecommendation))
+            {
+                entityRecommendation.Type = "Package";
+                await context.PostAsync($"Following people are assigned to Package No# {entityRecommendation.Entity}");
+            }
+            else if (result.TryFindEntity(EntityNumber, out entityRecommendation))
+            {
+                entityRecommendation.Type = "Project";
+                await context.PostAsync($"Following people are assigned to Project {entityRecommendation.Entity}");
+            }
+
+            if (entityRecommendation != null && !string.IsNullOrEmpty(entityRecommendation.Type))
+            {
+                var resultMessage = context.MakeMessage();
+                resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                resultMessage.Attachments = new List<Attachment>();
+
+                for (int i = 0; i < 6; i++)
+                {
+                    var random = new Random(i);
+                    ThumbnailCard thumbnailCard = new ThumbnailCard()
+                    {
+                        Title = GetRoles()[i],
+                        Text = GetPeople()[i,0],
+                        Images = new List<CardImage>()
+                        {
+                            new CardImage { Url = GetPeople()[i,1] }
+                        }
+                    };
+
+                    resultMessage.Attachments.Add(thumbnailCard.ToAttachment());
+                }
+                await context.PostAsync(resultMessage);
+            }
+            else
+            {
+                await context.PostAsync("Sorry, i am not able to find a valid project number in your message. please type something like 'display comments for llw 12012', or 'show comments for design bundle 132043''");
+            }
             context.Wait(this.MessageReceived);
         }
         #endregion
@@ -451,6 +507,33 @@ namespace SCA_Bot.Dialogs
                                         "PS971.jpg"
             };
             return pics;
+        }
+
+        private static string[] GetRoles()
+        {
+            string[] roles = new string[]
+            {
+                "Project Officer",
+                "SPO",
+                "DPM",
+                "DM",
+                "Studio Director",
+                "CPO"
+            };
+            return roles;
+        }
+        public static string[,] GetPeople()
+        {
+            string[,] people = new string[,]
+            {
+                {"HEGHES, CORNEL","https://s3.amazonaws.com/nycsca-pics/people/HEGHESCORNEL.JPG" },
+                { "TIEDEMANN, ERIC", "https://s3.amazonaws.com/nycsca-pics/people/TIDEMANNERICP.JPG"},
+                { "SAINZ, CARLOS","https://s3.amazonaws.com/nycsca-pics/people/SAINGCARLOS.JPG"},
+                { "MORRISON, CLEVELAND","https://s3.amazonaws.com/nycsca-pics/people/MORRISONCLEVELAND.JPG"},
+                { "ABNERI, ELAN","https://s3.amazonaws.com/nycsca-pics/people/ABNERIELAN.JPG"},
+                { "COLOMBO, CARL","https://s3.amazonaws.com/nycsca-pics/people/COLOMBOCARL.JPG"}
+            };
+            return people;
         }
         #endregion
 
