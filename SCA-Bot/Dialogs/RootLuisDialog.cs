@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Microsoft.Bot.Builder.FormFlow;
 using System.Linq;
 using System.Web;
+using SCA_Bot.FormFlow;
 
 namespace SCA_Bot.Dialogs
 {
@@ -56,9 +57,93 @@ namespace SCA_Bot.Dialogs
         [LuisIntent("Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Hi! Try asking me things like 'show me active projects in school 146', 'display schedule for Design bunlde 12012' or 'give me a list of construction projects in manhattan' or ask your own question.");
+            await context.PostAsync("Hi! I am super-powered SCA Bot! Try asking me things like 'show me active projects in school 146', 'display schedule for Design bunlde 12012' or 'give me a list of construction projects in manhattan' or ask your own question.");
 
             context.Wait(this.MessageReceived);
+        }
+        #endregion
+
+        #region CreateTicket Intent
+        [LuisIntent("CreateTicket")]
+        public async Task CreateTicket(IDialogContext context, LuisResult result)
+        {
+            var helpDeskTicketForm = FormDialog.FromForm(HelpDeskTicket.BuildForm, options: FormOptions.PromptInStart);
+            context.Call(helpDeskTicketForm, HelpDeskTicketDialogResumeAfter);
+        }
+        private async Task HelpDeskTicketDialogResumeAfter(IDialogContext context, IAwaitable<HelpDeskTicket> result)
+        {
+            await context.PostAsync("Thanks! A Ticket has been created and sent to Help Desk! Someone will get in touch with you soon.");
+            context.Wait(this.MessageReceived);
+        }
+        #endregion
+
+        #region GetITTrainingCalendar
+        [LuisIntent("GetITTrainingCalendar")]
+        private async Task GetITTrainingCalendar(IDialogContext context, LuisResult result)
+        {
+            Attachment attachment1 = new Attachment();
+            attachment1.Name = "SCA-IT-Training-Calendar.pdf";
+            attachment1.ContentType = "application/pdf";
+            attachment1.ContentUrl = "https://s3.amazonaws.com/nycsca-videos/sca-it-training-calendar.pdf";
+
+            var message = context.MakeMessage();
+            message.Attachments.Add(attachment1);
+            message.Text = "Here is the schedule for IT Training";
+
+            await context.PostAsync(message);
+        }
+        #endregion
+        #region GetUserGuide
+        [LuisIntent("GetUserGuide")]
+        private async Task GetUserGuide(IDialogContext context, LuisResult result)
+        {
+            Attachment attachment1 = new Attachment();
+            attachment1.Name = "eFleet-Mobile-App-User-Guide.ppt";
+            attachment1.ContentType = "application/vnd.ms-powerpoint";
+            attachment1.ContentUrl = "https://s3.amazonaws.com/nycsca-videos/efleet.ppt";
+
+            var message = context.MakeMessage();
+            message.Attachments.Add(attachment1);
+            message.Text = "Following user guide describes how to use eFleet mobile app to log sca vehicle trip mileage.";
+
+            await context.PostAsync(message);
+        }
+        #endregion
+        #region DisplayVideo
+        [LuisIntent("DisplayVideo")]
+        private async Task DisplayVideo(IDialogContext context, LuisResult result)
+        {
+            var message = context.MakeMessage();
+
+            var videoCard = new VideoCard
+            {
+                Title = "Review Estimate",
+                Subtitle = "by SCA IT Dept.",
+                Text = "This video shows how to login to CES/ProEST application and review estimates.",
+                Image = new ThumbnailUrl
+                {
+                    Url = "https://s3.amazonaws.com/nycsca-pics/proest-thumbnail.JPG"
+                },
+                Media = new List<MediaUrl>
+                {
+                    new MediaUrl()
+                    {
+                        Url = "https://s3.amazonaws.com/nycsca-videos/proest1.mp4"
+                    }
+                },
+                Buttons = new List<CardAction>
+                            {
+                                new CardAction()
+                                {
+                                    Title = "Login to review Estimate",
+                                    Type = ActionTypes.OpenUrl,
+                                    Value = "https://nycscauat.proest.com"
+                                }
+                            }
+            };
+
+            message.Attachments.Add(videoCard.ToAttachment());
+            await context.PostAsync(message);
         }
         #endregion
 

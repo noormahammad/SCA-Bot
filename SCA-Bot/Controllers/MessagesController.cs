@@ -38,6 +38,11 @@ namespace SCA_Bot
                         Trace.TraceError(ex.ToString());
                     }
                 }
+                Activity typingReply = activity.CreateReply();
+                typingReply.Type = ActivityTypes.Typing;
+                ConnectorClient connectorCleint = new ConnectorClient(new Uri(activity.ServiceUrl));
+                await connectorCleint.Conversations.ReplyToActivityAsync(typingReply);
+
 
                 await Conversation.SendAsync(activity, () => new Dialogs.RootLuisDialog());
             }
