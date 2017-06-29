@@ -12,7 +12,7 @@ using SCA_Bot.FormFlow;
 
 namespace SCA_Bot.Dialogs
 {
-    [LuisModel("1c4c74d8-0558-4dd5-ac38-4893e87568d1", "c2c950862578433c834ffc4ae5341bc2")]
+    [LuisModel("YourModelId", "YourSubscriptionKey")]
     [Serializable]
     public class RootLuisDialog : LuisDialog<object>
     {
