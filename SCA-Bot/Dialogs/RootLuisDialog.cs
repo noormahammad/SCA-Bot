@@ -9,14 +9,18 @@ using Microsoft.Bot.Builder.FormFlow;
 using System.Linq;
 using System.Web;
 using SCA_Bot.FormFlow;
+using SCA_Bot.Model;
+using System.Net.Http;
+using SCA_Bot.Services;
 
 namespace SCA_Bot.Dialogs
 {
-    [LuisModel("YourModelId", "YourSubscriptionKey")]
+    [LuisModel("Your Model ID", "Your Subscription Key")]
     [Serializable]
     public class RootLuisDialog : LuisDialog<object>
     {
-        #region Variables
+        #region Variables       
+
         private const string EntityNumber = "builtin.number";
 
         private const string EntitySchoolName = "SchoolName";
@@ -24,19 +28,7 @@ namespace SCA_Bot.Dialogs
         private const string EntityBorough = "Borough";
         private const string EntityLLW = "LLW";
         private const string EntityDesignBundle = "DesignBundle";
-        private const string EntityPackage = "Package";
-
-        private IList<string> PhaseOptions = new List<string> { "Closeout", "Construction", "Request for Contract", "Bid & Award", "Design", "Scope","Pre-Scope"};
-        private List<string> Schdules = new List<string> {
-            "Forecast%20Begin%20Date1%2012/3/2017%0A%0AForecast%20End%20Date%206/1/2018",
-            "Actual%20Begin%20Date%201/25/2016%0A%0AForecast%20End%20Date%2012/2/2017",
-            "Actual%20Begin%20Date%204/13/2015%0A%0AActual%20End%20Date%2011/16/2015",
-            "Actual%20Begin%20Date%201/5/2015%0A%0AActual%20End%20Date%203/9/2015",
-            "Actual%20Begin%20Date%201/5/2015%0A%0AActual%20End%20Date%203/9/2015",
-            "Actual%20Begin%20Date%2012/18/2014%0A%0AActual%20End%20Date%2012/7/2015",
-            "Actual%20Begin%20Date%202/23/2014%0A%0AActual%20End%20Date%2012/5/2014"
-        };
-        public List<string> colors = new List<string> {"928", "171", "317", "928", "171","317","928"};
+        private const string EntityPackage = "Package";        
 
         #endregion
 
@@ -93,6 +85,7 @@ namespace SCA_Bot.Dialogs
             await context.PostAsync(message);
         }
         #endregion
+
         #region GetUserGuide
         [LuisIntent("GetUserGuide")]
         private async Task GetUserGuide(IDialogContext context, LuisResult result)
@@ -109,6 +102,7 @@ namespace SCA_Bot.Dialogs
             await context.PostAsync(message);
         }
         #endregion
+
         #region DisplayVideo
         [LuisIntent("DisplayVideo")]
         private async Task DisplayVideo(IDialogContext context, LuisResult result)
@@ -301,21 +295,30 @@ namespace SCA_Bot.Dialogs
                 resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 resultMessage.Attachments = new List<Attachment>();
 
-                for (int i = 0; i < 7; i++)
+                ScheduleService scheduleService = new ScheduleService();
+                List<Schedule> schedules = await scheduleService.GetSchedulesAsync(entityRecommendation.Entity);
+
+                foreach (Schedule schedule in schedules)
                 {
+                    string beginDate;
+                    string endDate;
+
+                    if (!string.IsNullOrEmpty(schedule.ActualBeginDate))
+                        beginDate = $"Actual Begin Date   {schedule.ActualBeginDate}";
+                    else
+                        beginDate = $"Forecast Begin Date   {schedule.ForecastBeginDate}";
+
+                    if (!string.IsNullOrEmpty(schedule.ActualEndDate))
+                        endDate = $"Actual End Date   {schedule.ActualEndDate}";
+                    else
+                        endDate = $"Forecast End Date   {schedule.ForecastEndDate}";
+
                     HeroCard card = new HeroCard()
                     {
-                        Title = PhaseOptions[i],
-                        Subtitle = $"{entityRecommendation.Type}# {entityRecommendation.Entity}",
-                        Images = new List<CardImage>()
-                    {
-                        new CardImage()
-                        {
-                          Url = $"https://placeholdit.imgix.net/~text?txtsize=12&txt={Schdules[i]}&w=250&h=120&txttrack=1&txtclr={colors[i]}&txtfont=bold"
-                        }
-                        }
+                        Title = schedule.PhaseName,
+                        Subtitle = $"{beginDate}          {endDate}" ,
+                        Text = $"{entityRecommendation.Type}# {entityRecommendation.Entity}"
                     };
-
                     resultMessage.Attachments.Add(card.ToAttachment());
                 }
                 await context.PostAsync(resultMessage);
