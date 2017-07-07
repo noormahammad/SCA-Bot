@@ -38,13 +38,23 @@ namespace SCA_Bot
                         Trace.TraceError(ex.ToString());
                     }
                 }
-                Activity typingReply = activity.CreateReply();
-                typingReply.Type = ActivityTypes.Typing;
-                ConnectorClient connectorCleint = new ConnectorClient(new Uri(activity.ServiceUrl));
-                await connectorCleint.Conversations.ReplyToActivityAsync(typingReply);
+
+                //fun part goes here
+                if (activity.Text.StartsWith("#"))
+                {
+                    await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                }
+                else
+                {
+
+                    Activity typingReply = activity.CreateReply();
+                    typingReply.Type = ActivityTypes.Typing;
+                    ConnectorClient connectorCleint = new ConnectorClient(new Uri(activity.ServiceUrl));
+                    await connectorCleint.Conversations.ReplyToActivityAsync(typingReply);
 
 
-                await Conversation.SendAsync(activity, () => new Dialogs.RootLuisDialog());
+                    await Conversation.SendAsync(activity, () => new Dialogs.RootLuisDialog());
+                }
             }
             else
             {
@@ -82,5 +92,6 @@ namespace SCA_Bot
 
             return null;
         }
+
     }
 }

@@ -112,6 +112,7 @@
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
+    <Compile Include="Dialogs\RootDialog.cs" />
     <Compile Include="Dialogs\RootLuisDialog.cs" />
     <Compile Include="FormFlow\HelpDeskTicket.cs" />
     <Compile Include="Global.asax.cs">
@@ -120,6 +121,7 @@
     <Compile Include="Model\Comment.cs" />
     <Compile Include="Model\Project.cs" />
     <Compile Include="Model\Schedule.cs" />
+    <Compile Include="NLPProcessor.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectsQuery.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
