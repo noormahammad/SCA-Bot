@@ -45,11 +45,24 @@ namespace SCA_Bot.Dialogs
         }
         #endregion
 
+        #region ThankYou
+        [LuisIntent("ThankYou")]
+        public async Task ThankYou(IDialogContext context, LuisResult result)
+        {
+            string message = $"Sure, anytime :)";
+
+            await context.PostAsync(message);
+
+            context.Wait(this.MessageReceived);
+        }
+        #endregion
+
+
         #region Help Intent
         [LuisIntent("Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Hi! I am super-powered SCA Bot! Try asking me things like 'show me active projects in school 146', 'display schedule for Design bunlde 12012' or 'give me a list of construction projects in manhattan' or ask your own question.");
+            await context.PostAsync("Hell there! I am super-powered SCA Bot! I can answer questions like these: \n\n Show me active projects in school 540 \n\n Display schedule for llw 084725 \n\n show me comments for llw 084725 \n\n who are assigned to llw 084725? \n\n How to use ProEST to review estimates? \n\n How to log my sca vehicle mileage? \n\n show me IT training calendar \n\n I am having trouble printing reports in PTS application. can you help me? \n\n or ask any other similar question \n\n Go ahead, try and ask me :)");
 
             context.Wait(this.MessageReceived);
         }
@@ -148,14 +161,7 @@ namespace SCA_Bot.Dialogs
         {
             var message = await activity;
 
-            var projectsQuery = new ProjectsQuery();
-
-            //EntityRecommendation cityEntityRecommendation;
-
-            //if (result.TryFindEntity(EntityGeographyCity, out cityEntityRecommendation))
-            //{
-            //    cityEntityRecommendation.Type = "Destination";
-            //}
+            var projectsQuery = new ProjectsQuery();            
 
             var projectsFormDialog = new FormDialog<ProjectsQuery>(projectsQuery, this.BuildProjectsForm, FormOptions.PromptInStart, result.Entities);
 
@@ -171,11 +177,19 @@ namespace SCA_Bot.Dialogs
                 {
                     message += $" in {state.SchoolName}...";
                 }
+                if (!string.IsNullOrEmpty(state.LLW))
+                {
+                    message += $" in {state.LLW}...";
+                }
                 else if (!string.IsNullOrEmpty(state.Borough))
                 {
-                    message += $" near {state.Borough.ToUpperInvariant()} airport...";
+                    message += $" near {state.Borough.ToUpperInvariant()} ";
                 }
-
+                else if (!string.IsNullOrEmpty(state.BuildingId))
+                {
+                    message += $" near {state.BuildingId.ToUpperInvariant()} ";
+                }
+                
                 await context.PostAsync(message);
             };
 
@@ -192,51 +206,24 @@ namespace SCA_Bot.Dialogs
             {
                 var searchQuery = await result;
 
-                var projects = await this.GetProjectsAsync(searchQuery);
+                ProjectService projectService = new ProjectService();
+
+                string schoolName = searchQuery.SchoolName!=null?searchQuery.SchoolName.Replace("School", "").Replace("school",""):string.Empty;
+                string LLW = searchQuery.LLW != null ? searchQuery.LLW.Replace("LLW", "").Replace("llw","").Replace("Llw",""): string.Empty;
+                string Borough = searchQuery.Borough != null ? searchQuery.Borough.Replace("Borough", "").Replace("borough",""): string.Empty;
+                string BuildingId = searchQuery.BuildingId != null ? searchQuery.BuildingId.Replace("BuildingId", "").Replace("buildingid","") : string.Empty;
+
+                var projects = await projectService.GetProjectsAsync($"{schoolName} {LLW} {Borough} {BuildingId}");
+                
+                if(projects.Count == 0)
+                {
+                    await context.PostAsync($"Sorry, I cannot find any projects for {searchQuery.SchoolName} {searchQuery.LLW} {searchQuery.Borough} {searchQuery.BuildingId}. Please make sure to provide valid school name or buildig name or valid school code or building code or id.");
+                    return;
+                }
 
                 await context.PostAsync($"I found {projects.Count()} projects:");
 
-                var resultMessage = context.MakeMessage();
-                resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
-                resultMessage.Attachments = new List<Attachment>();
-
-                foreach (var project in projects)
-                {
-                    HeroCard heroCard = new HeroCard()
-                    {
-                        Title = $"{project.SchoolName} {project.LLWDescription}",
-                        Subtitle = $"LLW# {project.LLW}. Constr.Cost {project.ConstructionCost.ToString("C0")}.",
-                        Images = new List<CardImage>()
-                        {
-                            new CardImage() { Url = project.Image }
-                        },
-                        Buttons = new List<CardAction>()
-                        {
-                            new CardAction()
-                            {
-                                Title = "Schedules",
-                                Type = ActionTypes.ImBack,
-                                Value = $"Show Schedules for LLW {project.LLW}"
-                            },
-                            new CardAction()
-                            {
-                                Title = "Comments",
-                                Type = ActionTypes.ImBack,
-                                Value = $"Show Comments for LLW {project.LLW}"
-                            },
-                            new CardAction()
-                            {
-                                Title = "People",
-                                Type = ActionTypes.ImBack,
-                                Value = $"show people assigned to LLW {project.LLW}"
-                            }
-                        }
-                    };
-
-                    resultMessage.Attachments.Add(heroCard.ToAttachment());
-                }
-
-                await context.PostAsync(resultMessage);
+                await DisplayProjects(context, projects);
             }
             catch (FormCanceledException ex)
             {
@@ -257,6 +244,53 @@ namespace SCA_Bot.Dialogs
             {
                 context.Done<object>(null);
             }
+        }
+
+        private async Task DisplayProjects(IDialogContext context, List<Project> projects)
+        {
+            var resultMessage = context.MakeMessage();
+            resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            resultMessage.Attachments = new List<Attachment>();
+            var random = new Random();
+
+            foreach (var project in projects)
+            {
+                HeroCard heroCard = new HeroCard()
+                {
+                    Title = $"{project.OrgName} {project.LLWDescription}",
+                    Subtitle = $"LLW#{project.LLWCode} DB#{project.DesignCode} Pkg#{project.PackageCode}",
+                    Text = $"{project.BuildingAddress}. Constr.Amount {project.DOEConstructAmt.ToString("C0")} {project.StationDesc} {project.ActivityDesc} {project.SASStatus} {project.CapitalCategoryDesc}",
+                    Images = new List<CardImage>()
+                        {
+                            new CardImage() { Url = $"https://nycsca.imgix.net/{GetBuildingPics()[random.Next(1, 11)]}" }
+                        },
+                    Buttons = new List<CardAction>()
+                        {
+                            new CardAction()
+                            {
+                                Title = "Schedules",
+                                Type = ActionTypes.ImBack,
+                                Value = $"Show Schedules for LLW {project.LLWCode}"
+                            },
+                            new CardAction()
+                            {
+                                Title = "Comments",
+                                Type = ActionTypes.ImBack,
+                                Value = $"Show Comments for LLW {project.LLWCode}"
+                            },
+                            new CardAction()
+                            {
+                                Title = "People",
+                                Type = ActionTypes.ImBack,
+                                Value = $"show people assigned to LLW {project.LLWCode}"
+                            }
+                        }
+                };
+
+                resultMessage.Attachments.Add(heroCard.ToAttachment());
+            }
+
+            await context.PostAsync(resultMessage);
         }
 
         #endregion
@@ -298,6 +332,12 @@ namespace SCA_Bot.Dialogs
                 ScheduleService scheduleService = new ScheduleService();
                 List<Schedule> schedules = await scheduleService.GetSchedulesAsync(entityRecommendation.Entity);
 
+                if (schedules.Count == 0)
+                {
+                    await context.PostAsync($"Sorry, I cannot find any schedules for {entityRecommendation.Type} {entityRecommendation.Entity}. Make sure the LLW is valid and has 6 digits!");
+                    return;
+                }
+
                 foreach (Schedule schedule in schedules)
                 {
                     string beginDate;
@@ -316,16 +356,17 @@ namespace SCA_Bot.Dialogs
                     HeroCard card = new HeroCard()
                     {
                         Title = schedule.PhaseName,
-                        Subtitle = $"{beginDate}          {endDate}" ,
-                        Text = $"{entityRecommendation.Type}# {entityRecommendation.Entity}"
+                        Subtitle = $"{entityRecommendation.Type}# {entityRecommendation.Entity}",
+                        Text = $"{beginDate}          {endDate}"                        
                     };
+
                     resultMessage.Attachments.Add(card.ToAttachment());
                 }
                 await context.PostAsync(resultMessage);
             }
             else
             {
-                await context.PostAsync("Sorry, i am not able to find a valid project number in your message. please type something like 'show me schedule for db 12012''");
+                await context.PostAsync("Sorry, i dont see LLW number in your message. LLW number is a 6 digit code. please try typing like this: \n\n show me schedules for llw 082914 \n\n (you can type any LLW number!)");
             }
             context.Wait(this.MessageReceived);
         }
@@ -468,33 +509,33 @@ namespace SCA_Bot.Dialogs
 
         #region Get Data for demo purposes
 
-        private async Task<IEnumerable<Project>> GetProjectsAsync(ProjectsQuery searchQuery)
-        {
-            var projects = new List<Project>();
+        //private async Task<IEnumerable<Project>> GetProjectsAsync(ProjectsQuery searchQuery)
+        //{
+        //    var projects = new List<Project>();
 
-            // Filling the hotels results manually just for demo purposes
-            for (int i = 1; i <= 5; i++)
-            {
-                var random = new Random(i);
-                Project project = new Project()
-                {
-                    LLWDescription = GetLLWDescriptions()[random.Next(1, 14)],
-                    SchoolName = $"{searchQuery.SchoolName ?? searchQuery.Borough}",
-                    BuildingAddress = $"{GetAddresses()[random.Next(1, 24)]}, {GetBoroughs()[random.Next(1, 5)]}, NY",
-                    LLW = random.Next(100000, 999999),
-                    ConstructionCost = random.Next(950000, 4000000),
-                    AuthorizedTotalAmount = random.Next(950000, 4000000),
-                    //Image = $"https://placeholdit.imgix.net/~text?txtsize=35&txt=Project+{i}&w=500&h=260&txtclr=0{random.Next(0,9)}{random.Next(0,9)}&txtfont=bold"
-                    Image = $"https://nycsca.imgix.net/{GetBuildingPics()[random.Next(1, 11)]}"
-                };
+        //    // Filling the hotels results manually just for demo purposes
+        //    for (int i = 1; i <= 5; i++)
+        //    {
+        //        var random = new Random(i);
+        //        Project project = new Project()
+        //        {
+        //            LLWDescription = GetLLWDescriptions()[random.Next(1, 14)],
+        //            SchoolName = $"{searchQuery.SchoolName ?? searchQuery.Borough}",
+        //            BuildingAddress = $"{GetAddresses()[random.Next(1, 24)]}, {GetBoroughs()[random.Next(1, 5)]}, NY",
+        //            LLW = random.Next(100000, 999999),
+        //            ConstructionCost = random.Next(950000, 4000000),
+        //            AuthorizedTotalAmount = random.Next(950000, 4000000),
+        //            //Image = $"https://placeholdit.imgix.net/~text?txtsize=35&txt=Project+{i}&w=500&h=260&txtclr=0{random.Next(0,9)}{random.Next(0,9)}&txtfont=bold"
+        //            Image = $"https://nycsca.imgix.net/{GetBuildingPics()[random.Next(1, 11)]}"
+        //        };
 
-                projects.Add(project);
-            }
+        //        projects.Add(project);
+        //    }
 
-            projects.Sort((h1, h2) => h1.ConstructionCost.CompareTo(h2.ConstructionCost));
+        //    projects.Sort((h1, h2) => h1.ConstructionCost.CompareTo(h2.ConstructionCost));
 
-            return projects;
-        }
+        //    return projects;
+        //}
         private static string[] GetComments()
         {
             string[] comments = new string[] {

@@ -117,6 +117,8 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Model\Comment.cs" />
+    <Compile Include="Model\Project.cs" />
     <Compile Include="Model\Schedule.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="ProjectsQuery.cs" />
@@ -126,6 +128,8 @@
     <Compile Include="Services\BingSpellCheckResponse.cs" />
     <Compile Include="Services\BingSpellCheckService.cs" />
     <Compile Include="Services\BingSpellCheckSuggestion.cs" />
+    <Compile Include="Services\CommentsService.cs" />
+    <Compile Include="Services\ProjectService.cs" />
     <Compile Include="Services\ScheduleService.cs" />
   </ItemGroup>
   <ItemGroup>

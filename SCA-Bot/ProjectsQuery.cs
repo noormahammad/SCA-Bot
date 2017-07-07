@@ -18,5 +18,13 @@
         [Optional]
         public string DesignBundle { get; set; }
 
+        [Prompt("Please enter {&}")]
+        [Optional]
+        public string BuildingId { get; set; }
+
+        [Prompt("Please enter {&}")]
+        [Optional]
+        public string LLW { get; set; }
+
     }
 }
