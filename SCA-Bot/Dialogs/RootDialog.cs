@@ -26,8 +26,8 @@ namespace SCA_Bot.Dialogs
             try
             {
                 //get a random gif from giphy.com and send it as a card
-                //Trending GIF API:http://api.giphy.com/v1/gifs/trending?api_key=dc6zaTOxFJmzC
-                //Search GIF API: http://api.giphy.com/v1/gifs/search?q=funny+cat&api_key=dc6zaTOxFJmzC 
+                //Trending GIF API:http://api.giphy.com/v1/gifs/trending?api_key=
+                //Search GIF API: http://api.giphy.com/v1/gifs/search?q=funny+cat&api_key= 
 
                 var client = new HttpClient() { BaseAddress = new Uri("http://api.giphy.com") };
                 var resultJson = client.GetStringAsync($"/v1/gifs/search?q={inboundMessage.Text.Replace("#","").Replace(" ", "+")}&api_key={your api key here}").Result;
