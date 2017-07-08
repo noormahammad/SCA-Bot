@@ -5,6 +5,7 @@ using Microsoft.Bot.Connector;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace SCA_Bot.Dialogs
 {
@@ -30,7 +31,7 @@ namespace SCA_Bot.Dialogs
                 //Search GIF API: http://api.giphy.com/v1/gifs/search?q=funny+cat&api_key= 
 
                 var client = new HttpClient() { BaseAddress = new Uri("http://api.giphy.com") };
-                var resultJson = client.GetStringAsync($"/v1/gifs/search?q={inboundMessage.Text.Replace("#","").Replace(" ", "+")}&api_key={your api key here}").Result;
+                var resultJson = client.GetStringAsync($"/v1/gifs/search?q={inboundMessage.Text.Replace("#","").Replace(" ", "+")}&api_key={ConfigurationManager.AppSettings["GiphyApiKey"]}").Result;
                 var data = ((dynamic)JObject.Parse(resultJson)).data;
                 var gif = data[(int)Math.Floor(new Random().NextDouble() * data.Count)];
                 var gifUrl = gif.images.fixed_height.url.Value;

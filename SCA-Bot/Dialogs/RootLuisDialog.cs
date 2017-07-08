@@ -257,9 +257,9 @@ namespace SCA_Bot.Dialogs
             {
                 HeroCard heroCard = new HeroCard()
                 {
-                    Title = $"{project.OrgName} {project.LLWDescription}",
+                    Title = $"{project.OrgCode} {project.OrgName}",
                     Subtitle = $"LLW#{project.LLWCode} DB#{project.DesignCode} Pkg#{project.PackageCode}",
-                    Text = $"{project.BuildingAddress}. Constr.Amount {project.DOEConstructAmt.ToString("C0")} {project.StationDesc} {project.ActivityDesc} {project.SASStatus} {project.CapitalCategoryDesc}",
+                    Text = $"Located at {project.BuildingAddress} and expected to cost {project.DOEConstructAmt.ToString("C0")} for construction work of {project.LLWDescription}",
                     Images = new List<CardImage>()
                         {
                             new CardImage() { Url = $"https://nycsca.imgix.net/{GetBuildingPics()[random.Next(1, 11)]}" }
