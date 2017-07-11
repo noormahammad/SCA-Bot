@@ -41,7 +41,8 @@ namespace SCA_Bot.Dialogs
 
             await context.PostAsync(message);
 
-            context.Wait(this.MessageReceived);
+            //context.Wait(this.MessageReceived);
+            context.Done<object>(null);
         }
         #endregion
 
@@ -53,7 +54,8 @@ namespace SCA_Bot.Dialogs
 
             await context.PostAsync(message);
 
-            context.Wait(this.MessageReceived);
+            //context.Wait(this.MessageReceived);
+            context.Done<object>(null);
         }
         #endregion
 
@@ -64,7 +66,8 @@ namespace SCA_Bot.Dialogs
         {
             await context.PostAsync("Hell there! I am super-powered SCA Bot! I can answer questions like these: \n\n \n\n Show me active projects in school 540 \n\n Display schedule for llw 084725 \n\n show me comments for llw 084725 \n\n who are assigned to llw 084725? \n\n How to use ProEST to review estimates? \n\n How to log my sca vehicle mileage? \n\n show me IT training calendar \n\n I am having trouble printing reports in PTS application. can you help me? \n\n \n\n (Or ask any other similar question in your own words) \n\n \n\n Go ahead, try and ask me :)");
 
-            context.Wait(this.MessageReceived);
+            //context.Wait(this.MessageReceived);
+            context.Done<object>(null);
         }
         #endregion
 
@@ -78,7 +81,8 @@ namespace SCA_Bot.Dialogs
         private async Task HelpDeskTicketDialogResumeAfter(IDialogContext context, IAwaitable<HelpDeskTicket> result)
         {
             await context.PostAsync("Thanks! A Ticket has been created and sent to Help Desk! Someone will get in touch with you soon.");
-            context.Wait(this.MessageReceived);
+            //context.Wait(this.MessageReceived);
+            context.Done<object>(null);
         }
         #endregion
 
@@ -96,6 +100,7 @@ namespace SCA_Bot.Dialogs
             message.Text = "Here is the schedule for IT Training";
 
             await context.PostAsync(message);
+            context.Done<object>(null);
         }
         #endregion
 
@@ -113,6 +118,7 @@ namespace SCA_Bot.Dialogs
             message.Text = "Following user guide describes how to use eFleet mobile app to log sca vehicle trip mileage.";
 
             await context.PostAsync(message);
+            context.Done<object>(null);
         }
         #endregion
 
@@ -151,6 +157,8 @@ namespace SCA_Bot.Dialogs
 
             message.Attachments.Add(videoCard.ToAttachment());
             await context.PostAsync(message);
+            context.Done<object>(null);
+
         }
         #endregion
 
@@ -218,6 +226,7 @@ namespace SCA_Bot.Dialogs
                 if(projects.Count == 0)
                 {
                     await context.PostAsync($"Sorry, I cannot find any projects for {searchQuery.SchoolName} {searchQuery.LLW} {searchQuery.Borough} {searchQuery.BuildingId}. Please make sure to provide valid school name or buildig name or valid school code or building code or id.");
+                    context.Done<object>(null);
                     return;
                 }
 
@@ -259,7 +268,7 @@ namespace SCA_Bot.Dialogs
                 {
                     Title = $"{project.OrgCode} {project.OrgName}",
                     Subtitle = $"LLW#{project.LLWCode} DB#{project.DesignCode} Pkg#{project.PackageCode}",
-                    Text = $"Located at {project.BuildingAddress} and expected to cost {project.DOEConstructAmt.ToString("C0")} for construction work of {project.LLWDescription}",
+                    Text = $"Located at {project.BuildingAddress} and expected to cost {project.DOEConstructAmt.ToString("C0")} for {project.LLWDescription}",
                     Images = new List<CardImage>()
                         {
                             new CardImage() { Url = $"https://nycsca.imgix.net/{GetBuildingPics()[random.Next(1, 11)]}" }
@@ -335,6 +344,7 @@ namespace SCA_Bot.Dialogs
                 if (schedules.Count == 0)
                 {
                     await context.PostAsync($"Sorry, I cannot find any schedules for {entityRecommendation.Type} {entityRecommendation.Entity}. Make sure the LLW is valid and has 6 digits!");
+                    context.Done<object>(null);
                     return;
                 }
 
@@ -368,7 +378,9 @@ namespace SCA_Bot.Dialogs
             {
                 await context.PostAsync("Sorry, i dont see LLW number in your message. LLW number is a 6 digit code. please try typing like this: \n\n show me schedules for llw 082914 \n\n (you can type any LLW number!)");
             }
-            context.Wait(this.MessageReceived);
+
+            //context.Wait(this.MessageReceived);
+            context.Done<object>(null);
         }
 
         #endregion
@@ -431,7 +443,8 @@ namespace SCA_Bot.Dialogs
             {
                 await context.PostAsync("Sorry, i am not able to find a valid project number in your message. please type something like 'display comments for llw 12012', or 'show comments for design bundle 132043''");
             }
-            context.Wait(this.MessageReceived);
+            //context.Wait(this.MessageReceived);
+            context.Done<object>(null);
         }
         #endregion
 
@@ -446,7 +459,8 @@ namespace SCA_Bot.Dialogs
             else
                 await context.PostAsync("Sorry, i did not get that! type help if you need assistance!");
 
-            context.Wait(this.MessageReceived);
+            //context.Wait(this.MessageReceived);
+            context.Done<object>(null);
         }
         #endregion
 
@@ -503,7 +517,9 @@ namespace SCA_Bot.Dialogs
             {
                 await context.PostAsync("Sorry, i am not able to find a valid project number in your message. please type something like 'display comments for llw 12012', or 'show comments for design bundle 132043''");
             }
-            context.Wait(this.MessageReceived);
+
+            //context.Wait(this.MessageReceived);
+            context.Done<object>(null);
         }
         #endregion
 

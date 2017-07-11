@@ -40,12 +40,12 @@ namespace SCA_Bot
                 }
 
                 //fun part goes here
-                if (activity.Text.StartsWith("#"))
-                {
-                    await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
-                }
-                else
-                {
+                //if (activity.Text.StartsWith("#"))
+                //{
+                //    await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                //}
+                //else
+                //{
 
                     Activity typingReply = activity.CreateReply();
                     typingReply.Type = ActivityTypes.Typing;
@@ -53,8 +53,8 @@ namespace SCA_Bot
                     await connectorCleint.Conversations.ReplyToActivityAsync(typingReply);
 
 
-                    await Conversation.SendAsync(activity, () => new Dialogs.RootLuisDialog());
-                }
+                    await Conversation.SendAsync(activity, () => new Dialogs.RootDialog());
+                //}
             }
             else
             {
