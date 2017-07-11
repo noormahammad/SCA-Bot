@@ -62,7 +62,7 @@ namespace SCA_Bot.Dialogs
         [LuisIntent("Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Hell there! I am super-powered SCA Bot! I can answer questions like these: \n\n \n\n Show me active projects in school 540 \n\n Display schedule for llw 084725 \n\n show me comments for llw 084725 \n\n who are assigned to llw 084725? \n\n How to use ProEST to review estimates? \n\n How to log my sca vehicle mileage? \n\n show me IT training calendar \n\n I am having trouble printing reports in PTS application. can you help me? \n\n \n\n (Or ask any other similar question in your own words) \n\n \n\n Go ahead, try and ask me :)");
+            await context.PostAsync("Hello there! I am super-powered SCA Bot! I can answer questions like these: \n\n \n\n Show me active projects in school 540 \n\n Display schedule for llw 084725 \n\n show me comments for llw 084725 \n\n who are assigned to llw 084725? \n\n How to use ProEST to review estimates? \n\n How to log my sca vehicle mileage? \n\n show me IT training calendar \n\n I am having trouble printing reports in PTS application. can you help me? \n\n \n\n (Or ask any other similar question in your own words) \n\n \n\n Go ahead, try and ask me :)");
 
             context.Wait(this.MessageReceived);
         }
